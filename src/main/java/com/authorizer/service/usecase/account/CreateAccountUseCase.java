@@ -2,7 +2,6 @@ package com.authorizer.service.usecase.account;
 
 import com.authorizer.service.domain.account.Account;
 import com.authorizer.service.domain.account.AccountGateway;
-import com.authorizer.service.exceptions.DomainException;
 import com.authorizer.service.usecase.UseCase;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;

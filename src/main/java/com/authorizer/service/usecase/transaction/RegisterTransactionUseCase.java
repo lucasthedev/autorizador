@@ -23,7 +23,7 @@ public class RegisterTransactionUseCase extends UseCase<RegisterTransactionComma
 
     private final String SUCCESS = "00";
     private final String REJECTED = "51";
-    private final String FODD = "FOOD";
+    private final String FOOD = "FOOD";
 
     public RegisterTransactionUseCase(TransactionGateway transactionGateway,
                                       MccGateway mccGateway,
@@ -45,7 +45,7 @@ public class RegisterTransactionUseCase extends UseCase<RegisterTransactionComma
 
         for(Mcc m: mccList){
             if(m.getMccCode().equals(mcc)){
-                if(m.getDescription().equals(FODD) &&
+                if(m.getDescription().equals(FOOD) &&
                         accountFound.getAvailableFoodCreditLimit().compareTo(amount) >= 0){
                     accountFound.subtractFromFoodCreditLimit(amount);
                     accountGateway.update(accountFound);
@@ -63,10 +63,10 @@ public class RegisterTransactionUseCase extends UseCase<RegisterTransactionComma
             }
         }
 
-        RegisterTransactionOutPut outPutMerchant = registerTransactionByMerchantName(merchant, accountFound, amount, accountId);
+        RegisterTransactionOutPut outPutMerchant = registerTransactionByMerchantName(merchant, accountFound, amount);
         if(outPutMerchant != null) return outPutMerchant;
 
-        RegisterTransactionOutPut outPutCasCreditLimit = registerTransactionByCashCreditLimit(accountFound, amount, accountId, merchant);
+        RegisterTransactionOutPut outPutCasCreditLimit = registerTransactionByCashCreditLimit(accountFound, amount, merchant);
         if (outPutCasCreditLimit != null) return outPutCasCreditLimit;
 
 
@@ -75,24 +75,24 @@ public class RegisterTransactionUseCase extends UseCase<RegisterTransactionComma
         return RegisterTransactionOutPut.from(REJECTED);
     }
 
-    private RegisterTransactionOutPut registerTransactionByCashCreditLimit(Account accountFound, BigDecimal amount, String accountId, String merchant) {
+    private RegisterTransactionOutPut registerTransactionByCashCreditLimit(Account accountFound, BigDecimal amount, String merchant) {
         if(accountFound.getAvailableCashCreditLimit().compareTo(amount) >= 0){
             accountFound.subtractFromCashCreditLimit(amount);
             accountGateway.update(accountFound);
-            final var transaction = Transaction.newTransaction(accountId,"999", amount, merchant, SUCCESS);
+            final var transaction = Transaction.newTransaction(accountFound.getId(),"999", amount, merchant, SUCCESS);
             transactionGateway.create(transaction);
             return RegisterTransactionOutPut.from(SUCCESS);
         }
         return null;
     }
 
-    private RegisterTransactionOutPut registerTransactionByMerchantName(String merchant, Account accountFound, BigDecimal amount, String accountId) {
+    private RegisterTransactionOutPut registerTransactionByMerchantName(String merchant, Account accountFound, BigDecimal amount) {
         String mccByMerchantName = MerchantUtils.findMccByMerchantName(merchant);
-        if(!mccByMerchantName.isBlank() && merchant.equals(FODD)){
+        if(!mccByMerchantName.isBlank() && mccByMerchantName.equals(FOOD)){
             if(accountFound.getAvailableFoodCreditLimit().compareTo(amount) >=0 ){
                 accountFound.subtractFromFoodCreditLimit(amount);
                 accountGateway.update(accountFound);
-                final var transaction = Transaction.newTransaction(accountId,mccByMerchantName, amount, merchant, SUCCESS);
+                final var transaction = Transaction.newTransaction(accountFound.getId(),mccByMerchantName, amount, merchant, SUCCESS);
                 transactionGateway.create(transaction);
                 return RegisterTransactionOutPut.from(SUCCESS);
             }

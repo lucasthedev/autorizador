@@ -1,7 +1,6 @@
 package com.authorizer.service.api.controllers;
 
 import com.authorizer.service.api.controllers.request.CreateAccountRequest;
-import com.authorizer.service.exceptions.DomainException;
 import com.authorizer.service.usecase.account.CreateAccountCommand;
 import com.authorizer.service.usecase.account.CreateAccountUseCase;
 import org.springframework.http.HttpStatus;
@@ -22,7 +21,7 @@ public class AccountController {
     }
 
     @PostMapping
-    ResponseEntity<Object> createAccount(@RequestBody CreateAccountRequest request) throws DomainException {
+    ResponseEntity<Object> createAccount(@RequestBody CreateAccountRequest request) {
         final var command = CreateAccountCommand.with(request.documentNumber(), request.availableFoodCreditLimit(),
                 request.availableMealCreditLimit(),request.availableCashCreditLimit());
 
