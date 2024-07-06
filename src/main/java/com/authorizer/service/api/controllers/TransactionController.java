@@ -59,7 +59,7 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.OK).body("Code: 00");
         }
         else{
-            PaymentData paymentData = new PaymentData();
+            final var paymentData = PaymentData.newPaymentData(redisId);
             paymentData.setId(redisId);
             paymentDataRepository.save(paymentData);
         }
