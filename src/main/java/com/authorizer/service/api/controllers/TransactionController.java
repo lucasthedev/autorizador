@@ -1,6 +1,8 @@
 package com.authorizer.service.api.controllers;
 
 import com.authorizer.service.api.controllers.request.RegisterTransactionRequest;
+import com.authorizer.service.infrastructure.persistence.redis.PaymentData;
+import com.authorizer.service.infrastructure.persistence.redis.PaymentDataRepository;
 import com.authorizer.service.usecase.transaction.RegisterTransactionCommand;
 import com.authorizer.service.usecase.transaction.RegisterTransactionUseCase;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,9 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class TransactionController {
 
     private final RegisterTransactionUseCase registerTransactionUseCase;
+    private final PaymentDataRepository paymentDataRepository;
 
-    public TransactionController(RegisterTransactionUseCase registerTransactionUseCase) {
+    public TransactionController(RegisterTransactionUseCase registerTransactionUseCase,
+                                 PaymentDataRepository paymentDataRepository) {
         this.registerTransactionUseCase = registerTransactionUseCase;
+        this.paymentDataRepository = paymentDataRepository;
     }
 
     @PostMapping
@@ -38,10 +43,26 @@ public class TransactionController {
         final var mcc = request.mcc();
         final var merchant = request.merchant();
 
+        String redisId = amount+mcc+merchant.hashCode();
+        ResponseEntity<Object> OK = checkIdemPotencyKey(redisId);
+        if (OK != null) return OK;
+
         final var command = RegisterTransactionCommand.with(accountId,amount,mcc,merchant);
 
         final var outPut = registerTransactionUseCase.execute(command);
 
         return ResponseEntity.status(HttpStatus.OK).body("Code: " + outPut.code());
+    }
+
+    private ResponseEntity<Object> checkIdemPotencyKey(String redisId) {
+        if(paymentDataRepository.existsById(redisId)){
+            return ResponseEntity.status(HttpStatus.OK).body("Code: 00");
+        }
+        else{
+            PaymentData paymentData = new PaymentData();
+            paymentData.setId(redisId);
+            paymentDataRepository.save(paymentData);
+        }
+        return null;
     }
 }

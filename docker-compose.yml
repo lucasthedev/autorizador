@@ -1,6 +1,14 @@
 version: '3.9'
 
 services:
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - cache:/data
+
   postgres:
     image: postgres:14-alpine
     ports:
@@ -9,3 +17,7 @@ services:
       - POSTGRES_PASSWORD=312Caju
       - POSTGRES_USER=caju_user
       - POSTGRES_DB=caju_bank
+
+volumes:
+  cache:
+    driver: local
