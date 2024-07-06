@@ -67,4 +67,16 @@ public class Account {
     public BigDecimal getAvailableMealCreditLimit() {
         return availableMealCreditLimit;
     }
+
+    public void subtractFromCashCreditLimit(BigDecimal amount){
+        this.availableCashCreditLimit = availableCashCreditLimit.subtract(amount);
+    }
+
+    public void subtractFromFoodCreditLimit(BigDecimal amount){
+        this.availableFoodCreditLimit = availableFoodCreditLimit.subtract(amount);
+    }
+
+    public void subtractFromMealCreditLimit(BigDecimal amount){
+        this.availableMealCreditLimit = availableMealCreditLimit.subtract(amount);
+    }
 }

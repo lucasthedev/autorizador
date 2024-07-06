@@ -17,7 +17,7 @@ public class CreateAccountUseCase extends UseCase<CreateAccountCommand, CreateAc
     }
 
     @Override
-    public CreateAccountOutPut execute(CreateAccountCommand input) throws DomainException {
+    public CreateAccountOutPut execute(CreateAccountCommand input){
         final var documentNumber = input.documentNumber();
         final var availableFoodCreditLimit = input.availableFoodCreditLimit();
         final var availableMealCreditLimit = input.availableMealCreditLimit();
