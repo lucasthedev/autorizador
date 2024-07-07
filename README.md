@@ -22,7 +22,7 @@ Serviço para registro de transações financeiras.
 Executar o seguinte comando no direteório raíz do projeto 
 para subir o banco de dados:
 ```
-docker-compose up
+docker-compose up -d
 ```
 Após verificado que o banco está em funcionamento, realizar o build do projeto com maven:
 ```
