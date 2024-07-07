@@ -14,6 +14,7 @@ Serviço para registro de transações financeiras.
  * Swagger
  * JUnit
  * Mockito
+ * Redis
 
 
 ## 🔧 Passos para execução do projeto
