@@ -36,3 +36,6 @@ Para visualizar a documentação dos end-points, com a aplicação em execução
 ```
 http://localhost:8080/swagger-ui/index.html
 ```
+## ⚙️ Executando os end-points
+
+No diretório raiz do projeto contem uma collection para importar no postman.
