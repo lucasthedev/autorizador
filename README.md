@@ -38,4 +38,24 @@ http://localhost:8080/swagger-ui/index.html
 ```
 ## ⚙️ Executando os end-points
 
-No diretório raiz do projeto contem uma collection para importar no postman.
+No diretório raiz do projeto contém uma collection para importar no postman.
+
+1 - Deve-se primeiro cadastrar uma conta no end-point: http://localhost:8080/accounts com o payload abaixo:
+```
+{
+    "documentNumber": "123456",
+    "availableFoodCreditLimit": 1000.00,
+    "availableMealCreditLimit": 1000.00,
+    "availableCashCreditLimit": 1000.00
+}
+```
+
+2 - Para registrar as transações deve-se realizar um post para o end-point http://localhost:8080/transactions com o payload abaixo:
+```
+{
+    "accountId": "6289b07e-fae6-42c0-a2d1-c84a71cc24df",
+    "amount": 18.22,
+    "mcc": "5812",
+    "merchant": "PADARIA DO ZE"
+}
+```
