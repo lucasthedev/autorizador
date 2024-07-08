@@ -40,28 +40,10 @@ public class RegisterTransactionUseCase extends UseCase<RegisterTransactionComma
         final var mcc = input.mcc();
         final var merchant = input.merchant();
 
-        List<Mcc> mccList = mccGateway.findAllMcc();
         Account accountFound = accountGateway.findAccountById(accountId).get();
 
-        for(Mcc m: mccList){
-            if(m.getMccCode().equals(mcc)){
-                if(m.getDescription().equals(FOOD) &&
-                        accountFound.getAvailableFoodCreditLimit().compareTo(amount) >= 0){
-                    accountFound.subtractFromFoodCreditLimit(amount);
-                    accountGateway.update(accountFound);
-                    var transaction = Transaction.newTransaction(accountId,mcc,amount, merchant, SUCCESS);
-                    transactionGateway.create(transaction);
-                    return RegisterTransactionOutPut.from(SUCCESS);
-                }
-                else if(accountFound.getAvailableMealCreditLimit().compareTo(amount) >= 0){
-                    accountFound.subtractFromMealCreditLimit(amount);
-                    accountGateway.update(accountFound);
-                    var transaction = Transaction.newTransaction(accountId,mcc,amount, merchant, SUCCESS);
-                    transactionGateway.create(transaction);
-                    return RegisterTransactionOutPut.from(SUCCESS);
-                }
-            }
-        }
+        RegisterTransactionOutPut outputMcc = registerTransactionByMcc(mcc, accountFound, amount, merchant);
+        if (outputMcc != null) return outputMcc;
 
         RegisterTransactionOutPut outPutMerchant = registerTransactionByMerchantName(merchant, accountFound, amount);
         if(outPutMerchant != null) return outPutMerchant;
@@ -73,6 +55,29 @@ public class RegisterTransactionUseCase extends UseCase<RegisterTransactionComma
         final var transaction = Transaction.newTransaction(accountId,mcc,amount, merchant, REJECTED);
         transactionGateway.create(transaction);
         return RegisterTransactionOutPut.from(REJECTED);
+    }
+
+    private RegisterTransactionOutPut registerTransactionByMcc(String mcc, Account accountFound, BigDecimal amount,String merchant) {
+        List<Mcc> mccList = mccGateway.findAllMcc();
+        for(Mcc m: mccList){
+            if(m.getMccCode().equals(mcc)){
+                if(m.getDescription().equals(FOOD) && accountFound.getAvailableFoodCreditLimit().compareTo(amount) >= 0){
+                    accountFound.subtractFromFoodCreditLimit(amount);
+                    accountGateway.update(accountFound);
+                    final var transaction = Transaction.newTransaction(accountFound.getId(), mcc, amount, merchant, SUCCESS);
+                    transactionGateway.create(transaction);
+                    return RegisterTransactionOutPut.from(SUCCESS);
+                }
+                else if(accountFound.getAvailableMealCreditLimit().compareTo(amount) >= 0){
+                    accountFound.subtractFromMealCreditLimit(amount);
+                    accountGateway.update(accountFound);
+                    final var transaction = Transaction.newTransaction(accountFound.getId(), mcc, amount, merchant, SUCCESS);
+                    transactionGateway.create(transaction);
+                    return RegisterTransactionOutPut.from(SUCCESS);
+                }
+            }
+        }
+        return null;
     }
 
     private RegisterTransactionOutPut registerTransactionByCashCreditLimit(Account accountFound, BigDecimal amount, String merchant) {
@@ -88,14 +93,21 @@ public class RegisterTransactionUseCase extends UseCase<RegisterTransactionComma
 
     private RegisterTransactionOutPut registerTransactionByMerchantName(String merchant, Account accountFound, BigDecimal amount) {
         String mccByMerchantName = MerchantUtils.findMccByMerchantName(merchant);
-        if(!mccByMerchantName.isBlank() && mccByMerchantName.equals(FOOD)){
-            if(accountFound.getAvailableFoodCreditLimit().compareTo(amount) >=0 ){
+        if(!mccByMerchantName.isBlank() && mccByMerchantName.equals("5411")){
+            if(accountFound.getAvailableFoodCreditLimit().compareTo(amount) >= 0 ){
                 accountFound.subtractFromFoodCreditLimit(amount);
                 accountGateway.update(accountFound);
                 final var transaction = Transaction.newTransaction(accountFound.getId(),mccByMerchantName, amount, merchant, SUCCESS);
                 transactionGateway.create(transaction);
                 return RegisterTransactionOutPut.from(SUCCESS);
             }
+        }
+        else if(!mccByMerchantName.isBlank() && accountFound.getAvailableMealCreditLimit().compareTo(amount) >= 0){
+            accountFound.subtractFromMealCreditLimit(amount);
+            accountGateway.update(accountFound);
+            final var transaction = Transaction.newTransaction(accountFound.getId(),mccByMerchantName, amount, merchant, SUCCESS);
+            transactionGateway.create(transaction);
+            return RegisterTransactionOutPut.from(SUCCESS);
         }
         return null;
     }

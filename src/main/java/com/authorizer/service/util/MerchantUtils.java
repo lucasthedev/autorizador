@@ -9,10 +9,10 @@ public class MerchantUtils {
 
         for(String word: strings){
             if(FOOD.contains(word)){
-                return "FOOD";
+                return "5411";
             }
             if(MEAL.contains(word)){
-                return "MEAL";
+                return "5811";
             }
         }
 
