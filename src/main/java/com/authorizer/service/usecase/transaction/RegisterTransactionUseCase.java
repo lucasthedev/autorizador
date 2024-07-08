@@ -34,12 +34,11 @@ public class RegisterTransactionUseCase extends UseCase<RegisterTransactionComma
 
     @Override
     public RegisterTransactionOutPut execute(RegisterTransactionCommand input){
-        final var accountId = input.accountId();
         final var amount = input.amount();
         final var mcc = input.mcc();
         final var merchant = input.merchant();
 
-        Account accountFound = accountGateway.findAccountById(accountId).get();
+        Account accountFound = accountGateway.findAccountById(input.accountId()).get();
 
         RegisterTransactionOutPut outputMcc = registerTransactionByMcc(mcc, accountFound, amount, merchant);
         if (outputMcc != null) return outputMcc;
@@ -51,7 +50,7 @@ public class RegisterTransactionUseCase extends UseCase<RegisterTransactionComma
         if (outPutCasCreditLimit != null) return outPutCasCreditLimit;
 
 
-        final var transaction = Transaction.newTransaction(accountId,mcc,amount, merchant, REJECTED);
+        final var transaction = Transaction.newTransaction(accountFound.getId(),mcc,amount, merchant, REJECTED);
         transactionGateway.create(transaction);
         return RegisterTransactionOutPut.from(REJECTED);
     }
