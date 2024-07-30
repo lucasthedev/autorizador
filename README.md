@@ -1,4 +1,4 @@
-# Desafio Caju Backend
+# Autorizador
 
 Serviço para registro de transações financeiras.
 
