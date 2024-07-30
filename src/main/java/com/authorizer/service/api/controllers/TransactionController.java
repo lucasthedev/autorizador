@@ -55,14 +55,14 @@ public class TransactionController {
     }
 
     private ResponseEntity<Object> checkIdemPotencyKey(String redisId) {
+
         if(paymentDataRepository.existsById(redisId)){
             return ResponseEntity.status(HttpStatus.OK).body("Code: 00");
         }
-        else{
-            final var paymentData = PaymentData.newPaymentData(redisId);
-            paymentData.setId(redisId);
-            paymentDataRepository.save(paymentData);
-        }
+
+        final var paymentData = PaymentData.newPaymentData(redisId);
+        paymentData.setId(redisId);
+        paymentDataRepository.save(paymentData);
         return null;
     }
 }
